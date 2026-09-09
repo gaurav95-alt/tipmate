@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema(
     travelPreferences: { type: travelPreferencesSchema, default: () => ({}) },
     verificationStatus: { type: Boolean, default: false },
     emergencyContacts: { type: [emergencyContactSchema], default: [] },
+    trialEndsAt: { type: Date, index: true },
   },
   { timestamps: true }
 );
