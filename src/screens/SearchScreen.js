@@ -6,15 +6,15 @@ import PremiumGate from '../components/PremiumGate';
 const opts = { Destination: ['Jaipur', 'Goa', 'Manali', 'Kerala'], Budget: ['Budget', 'Comfort', 'Premium'], Interests: ['Adventure', 'Food', 'Nature', 'Culture'], Language: ['English', 'Hindi', 'Hinglish'] };
 
 function SearchContent({ navigation }) {
-  const [values, setValues] = useState({});
-  const choose = (key, value) => setValues((current) => ({ ...current, [key]: value }));
+  const [selected, setSelected] = useState({});
+  const choose = (key, value) => setSelected((current) => ({ ...current, [key]: value }));
   return (
     <ScrollView contentContainerStyle={b.content}>
       <Text style={b.title}>Find your match</Text>
       <Text style={b.subtitle}>Set your trip preferences and discover compatible companions.</Text>
-      {Object.entries(opts).map(([key, values]) => (
+      {Object.entries(opts).map(([key, options]) => (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.group} key={key}>
-          {values.map((value) => <Pressable key={value} style={[s.chip, values[key] === value && s.selected]} onPress={() => choose(key, value)}><Text style={values[key] === value ? s.selectedText : null}>{value}</Text></Pressable>)}
+          {options.map((value) => <Pressable key={value} style={[s.chip, selected[key] === value && s.selected]} onPress={() => choose(key, value)}><Text style={selected[key] === value ? s.selectedText : null}>{value}</Text></Pressable>)}
         </ScrollView>
       ))}
       <Text style={s.label}>Travel dates</Text>
