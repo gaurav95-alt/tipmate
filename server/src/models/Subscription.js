@@ -6,10 +6,15 @@ const subscriptionSchema = new mongoose.Schema(
     plan: { type: String, enum: ['free', 'premium'], default: 'free', index: true },
     status: {
       type: String,
-      enum: ['active', 'inactive', 'pending', 'cancelled', 'expired'],
-      default: 'active',
+      enum: ['trialing', 'active', 'cancelled', 'expired'],
+      default: 'trialing',
       index: true,
     },
+    billingCycle: { type: String, enum: ['monthly', 'yearly'] },
+    amount: { type: Number, min: 0 },
+    currency: { type: String, uppercase: true, trim: true, maxlength: 3, default: 'INR' },
+    trialStartedAt: { type: Date },
+    trialEndsAt: { type: Date, index: true },
     gateway: { type: String, trim: true, maxlength: 50 },
     gatewayCustomerId: { type: String, trim: true, maxlength: 150 },
     gatewaySubscriptionId: { type: String, trim: true, maxlength: 150 },
@@ -22,5 +27,6 @@ const subscriptionSchema = new mongoose.Schema(
 );
 
 subscriptionSchema.index({ plan: 1, status: 1 });
+subscriptionSchema.index({ billingCycle: 1, status: 1 });
 
 module.exports = mongoose.model('Subscription', subscriptionSchema);
