@@ -1,13 +1,19 @@
+const http = require('http');
 const app = require('./app');
 const env = require('./config/env');
 const connectDB = require('./config/db');
+const setupSocket = require('./socket');
 
 const startServer = async () => {
   try {
     await connectDB();
 
-    const server = app.listen(env.port, () => {
+    const httpServer = http.createServer(app);
+    setupSocket(httpServer, env.clientOrigin);
+
+    const server = httpServer.listen(env.port, () => {
       console.log(`JustSPAI API listening on port ${env.port}`);
+      console.log('Socket.io real-time chat is enabled');
     });
 
     const shutdown = (signal) => {
