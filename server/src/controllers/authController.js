@@ -38,6 +38,7 @@ const register = async (req, res, next) => {
       interests,
       travelPreferences,
       emergencyContacts,
+      lastActiveAt: new Date(),
     });
 
     const token = createToken(user._id.toString());
@@ -49,6 +50,8 @@ const register = async (req, res, next) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
+        isActive: user.isActive,
         verificationStatus: user.verificationStatus,
       },
     });
@@ -69,10 +72,17 @@ const login = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Invalid email or password.' });
     }
 
+    if (!user.isActive) {
+      return res.status(403).json({ success: false, message: 'This account has been deactivated.' });
+    }
+
     const passwordMatches = await bcrypt.compare(password, user.password);
     if (!passwordMatches) {
       return res.status(401).json({ success: false, message: 'Invalid email or password.' });
     }
+
+    user.lastActiveAt = new Date();
+    await user.save();
 
     const token = createToken(user._id.toString());
     return res.json({
@@ -83,6 +93,8 @@ const login = async (req, res, next) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
+        isActive: user.isActive,
         verificationStatus: user.verificationStatus,
       },
     });
