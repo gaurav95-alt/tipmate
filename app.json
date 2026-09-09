@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "JustSPAI",
+    "slug": "justspai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {"resizeMode": "contain", "backgroundColor": "#0A2540"},
+    "ios": {"supportsTablet": true},
+    "android": {"adaptiveIcon": {"backgroundColor": "#0A2540"}},
+    "web": {"bundler": "metro"}
+  }
+}
