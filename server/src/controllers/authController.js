@@ -1,6 +1,9 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Subscription = require('../models/Subscription');
+
+const TRIAL_DAYS = 7;
 
 const getJwtSecret = () => {
   if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is not configured.');
@@ -10,6 +13,12 @@ const getJwtSecret = () => {
 const createToken = (userId) => jwt.sign({ userId }, getJwtSecret(), {
   expiresIn: process.env.JWT_EXPIRES_IN || '7d',
 });
+
+const getTrialEnd = (start = new Date()) => {
+  const end = new Date(start);
+  end.setDate(end.getDate() + TRIAL_DAYS);
+  return end;
+};
 
 const register = async (req, res, next) => {
   try {
@@ -29,6 +38,9 @@ const register = async (req, res, next) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
+    const trialStartedAt = new Date();
+    const trialEndsAt = getTrialEnd(trialStartedAt);
+
     const user = await User.create({
       name,
       email: normalizedEmail,
@@ -38,13 +50,23 @@ const register = async (req, res, next) => {
       interests,
       travelPreferences,
       emergencyContacts,
-      lastActiveAt: new Date(),
+      trialEndsAt,
+      lastActiveAt: trialStartedAt,
+    });
+
+    await Subscription.create({
+      user: user._id,
+      plan: 'free',
+      status: 'trialing',
+      trialStartedAt,
+      trialEndsAt,
+      currency: 'INR',
     });
 
     const token = createToken(user._id.toString());
     return res.status(201).json({
       success: true,
-      message: 'Registration successful.',
+      message: 'Registration successful. Your 7-day free trial has started.',
       token,
       user: {
         id: user._id,
@@ -53,6 +75,7 @@ const register = async (req, res, next) => {
         role: user.role,
         isActive: user.isActive,
         verificationStatus: user.verificationStatus,
+        trialEndsAt: user.trialEndsAt,
       },
     });
   } catch (error) {
@@ -96,6 +119,7 @@ const login = async (req, res, next) => {
         role: user.role,
         isActive: user.isActive,
         verificationStatus: user.verificationStatus,
+        trialEndsAt: user.trialEndsAt,
       },
     });
   } catch (error) {
