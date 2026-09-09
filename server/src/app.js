@@ -6,6 +6,8 @@ const userRoutes = require('./routes/userRoutes');
 const safetyRoutes = require('./routes/safetyRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const subscriptionRoutes = require('./routes/subscriptionRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const env = require('./config/env');
 
@@ -30,6 +32,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/safety', safetyRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/subscription', subscriptionRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
